@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#635bff">
+  <meta name="description" content="สร้างแบบทดสอบ 20 ข้อวัดใจ แชร์ให้เพื่อน แล้วดูคะแนนได้">
+  <title>WATJAI — 20 ข้อวัดใจ</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-mark">W</span><span>WATJAI<span class="brand-sub">20 ข้อวัดใจ</span></span></a>
+    <span id="connectionBadge" class="status-pill"><i></i> ยังไม่เชื่อมฐานข้อมูล</span>
+  </header>
+
+  <main class="shell">
+    <section id="homeView" class="hero">
+      <div class="eyebrow"><span class="spark">✦</span> YOUR FRIENDSHIP, YOUR QUIZ</div>
+      <h1>มาดูกันว่า<br><span class="gradient-text">รู้จักเราดีแค่ไหน?</span></h1>
+      <p class="hero-copy">สร้างแบบทดสอบของตัวเอง ส่งลิงก์ให้เพื่อน แล้วมาวัดใจกัน 💜</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="goCreate">＋ สร้างแบบทดสอบ</button>
+        <button class="btn btn-secondary" id="goFind">ฉันมีลิงก์แบบทดสอบ ↗</button>
+      </div>
+      <div class="feature-row">
+        <div class="feature"><span class="feature-icon">✍️</span><b>สร้างเอง</b><small>คำถามของคุณ</small></div>
+        <div class="feature"><span class="feature-icon">🔗</span><b>แชร์ง่าย</b><small>ส่งลิงก์ให้เพื่อน</small></div>
+        <div class="feature"><span class="feature-icon">📊</span><b>ดูคะแนน</b><small>เช็กผลผู้เล่น</small></div>
+      </div>
+      <div id="linkLookup" class="lookup-panel hidden">
+        <label for="quizLinkInput">วางลิงก์หรือรหัสแบบทดสอบ</label>
+        <div class="inline-form"><input id="quizLinkInput" placeholder="วางลิงก์ที่เพื่อนส่งมา"><button id="openQuizBtn" class="btn btn-primary">เปิด</button></div>
+      </div>
+    </section>
+
+    <section id="createView" class="panel hidden">
+      <div class="section-heading"><div><div class="eyebrow">MAKE IT PERSONAL</div><h2>สร้างแบบทดสอบของคุณ</h2><p>ใส่คำถามและเลือกคำตอบที่ถูกต้อง เพื่อใช้คำนวณคะแนน</p></div><button class="icon-btn" id="backHome" aria-label="กลับหน้าแรก">✕</button></div>
+      <form id="quizForm">
+        <label class="field-label" for="quizTitle">ชื่อแบบทดสอบ</label>
+        <input id="quizTitle" maxlength="90" required placeholder="เช่น มาดูกันว่ารู้จักฟลุคแค่ไหน?">
+        <label class="field-label" for="quizDescription">คำอธิบาย (ไม่บังคับ)</label>
+        <input id="quizDescription" maxlength="180" placeholder="20 ข้อ วัดใจ เพื่อนแท้ต้องตอบได้!">
+        <div class="builder-heading"><div><h3>คำถาม <span id="questionCount">0</span>/20</h3><p>แต่ละข้อมี 4 ตัวเลือก</p></div><button type="button" class="btn btn-secondary btn-small" id="addQuestion">＋ เพิ่มคำถาม</button></div>
+        <div id="questionBuilder" class="question-builder"></div>
+        <div class="form-actions"><button type="button" class="btn btn-secondary" id="cancelCreate">ยกเลิก</button><button type="submit" class="btn btn-primary" id="publishBtn">สร้างและรับลิงก์ ↗</button></div>
+        <p class="fine-print">การเผยแพร่ต้องเชื่อมต่อ Supabase ก่อน ข้อมูลจะถูกเก็บออนไลน์ตามนโยบายฐานข้อมูลของโปรเจกต์</p>
+      </form>
+    </section>
+
+    <section id="playView" class="panel hidden">
+      <div class="play-top"><span id="playTag" class="eyebrow">20 ข้อวัดใจ</span><button id="exitPlay" class="text-btn">ออกจากแบบทดสอบ ✕</button></div>
+      <h2 id="playTitle">แบบทดสอบ</h2><p id="playDescription" class="muted"></p>
+      <div class="progress-meta"><span id="progressLabel">ข้อ 1</span><span id="progressPercent">0%</span></div><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+      <div id="questionArea"></div>
+      <div class="play-actions"><button id="nextQuestion" class="btn btn-primary" disabled>คำถามถัดไป →</button></div>
+    </section>
+
+    <section id="resultView" class="panel result-panel hidden">
+      <div class="result-confetti">✦　✧　✦</div><div class="eyebrow">QUIZ COMPLETED</div>
+      <div id="resultScore" class="score-number">0/0</div><h2 id="resultHeading">ทำเสร็จแล้ว!</h2><p id="resultMessage" class="muted"></p>
+      <label class="field-label" for="playerName">ชื่อเล่นของคุณ (ไม่บังคับ)</label><input id="playerName" maxlength="32" placeholder="เช่น คนเก่ง">
+      <div class="result-actions"><button id="saveResult" class="btn btn-primary">บันทึกคะแนน</button><button id="shareResult" class="btn btn-secondary">แชร์แบบทดสอบ ↗</button></div>
+      <p id="saveStatus" class="fine-print"></p>
+      <button id="retryQuiz" class="text-btn">ลองทำอีกครั้ง</button>
+    </section>
+
+    <section id="manageView" class="panel hidden">
+      <div class="section-heading"><div><div class="eyebrow">CREATOR SPACE</div><h2>แบบทดสอบของฉัน</h2><p>จัดการลิงก์และดูคะแนนที่บันทึกไว้</p></div><button class="icon-btn" id="backFromManage" aria-label="กลับหน้าแรก">✕</button></div>
+      <div id="myQuizzes" class="manage-list"></div>
+      <div id="scoresArea" class="scores-area hidden"></div>
+    </section>
+
+    <section id="shareView" class="panel hidden">
+      <div class="success-icon">✓</div><div class="eyebrow">YOUR QUIZ IS READY</div><h2>แบบทดสอบพร้อมแล้ว!</h2><p class="muted">คัดลอกลิงก์นี้แล้วส่งให้เพื่อนมาเล่นกันได้เลย</p>
+      <div class="share-link-row"><input id="shareLink" readonly><button id="copyShareLink" class="btn btn-primary">คัดลอก</button></div>
+      <div class="share-actions"><button id="playOwnQuiz" class="btn btn-secondary">ลองเล่น</button><button id="manageOwnQuiz" class="btn btn-primary">ดูคะแนนผู้เล่น</button></div>
+      <p id="shareStatus" class="fine-print"></p>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+  <footer><span>WATJAI © 2026</span><span>สร้างด้วยความวัดใจ 💜</span></footer>
+</body>
+</html>
