@@ -64,3 +64,6 @@
 - แบบทดสอบที่เผยแพร่เป็นสาธารณะ คนที่มีลิงก์เข้าถึงได้ อย่าใส่ข้อมูลส่วนตัวหรือข้อมูลลับ
 - คีย์ publishable เป็นคีย์สาธารณะ แต่ต้องไม่เปิดเผย secret/service_role key และต้องคง RLS ไว้
 - GitHub Pages เป็น static hosting จึงไม่รันโค้ด backend ของ Node/Python/PHP โดยตรง
+
+## ติดต่อ
+Instagram: https://www.instagram.com/_.tubsongautistic2?exln=bzV5ODZyMHZmcTMy
